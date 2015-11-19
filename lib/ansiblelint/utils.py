@@ -219,7 +219,7 @@ def normalize_task(task):
                 elif type(v) in [int, float]:
                     tags.append(str(v))
                 elif type(v) == list:
-                    tags.extend()
+                    tags.extend(v)
                 result[k] = tags
             else:
                 result[k] = v
