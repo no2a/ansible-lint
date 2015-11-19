@@ -200,8 +200,9 @@ def _kv_to_dict(v):
 
 
 def normalize_task(task):
-    ''' ensures that all tasks have an action key
-        and that string values are converted to python objects '''
+    ''' ensures that all tasks have an action key, that tags
+        are holded in lists and that string values are converted
+        to python objects '''
 
     result = dict()
     for (k, v) in task.items():
@@ -211,6 +212,15 @@ def normalize_task(task):
                     v = _kv_to_dict(v)
                 v['module_arguments'] = v.get('module_arguments', list())
                 result['action'] = v
+            elif k == 'tags':
+                tags = list()
+                if type(v) in [str, unicode]:
+                    tags.append(v)
+                elif type(v) in [int, float]:
+                    tags.append(str(v))
+                elif type(v) == list:
+                    tags.extend()
+                result[k] = tags
             else:
                 result[k] = v
         else:
