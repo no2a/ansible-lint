@@ -76,10 +76,23 @@ class TestUtils(unittest.TestCase):
 
     def test_normalize_task_is_idempotent(self):
         tasks = list()
-        tasks.append(dict(name="hello", action={'module': 'ec2', 'region': 'us-east1', 'etc': 'whatever'}))
+        tasks.append(dict(name="scalar", debug={'msg': 'single tag'}, tags='t'))
         tasks.append(dict(name="hello", ec2={'region': 'us-east1', 'etc': 'whatever'}))
         tasks.append(dict(name="hello", ec2="region=us-east1 etc=whatever"))
         tasks.append(dict(name="hello", action="ec2 region=us-east1 etc=whatever"))
         for task in tasks:
             normalized_task = utils.normalize_task(task)
             self.assertEquals(normalized_task, utils.normalize_task(normalized_task))
+
+    def test_normalize_task_tags(self):
+        tasks = list()
+        task1 = dict(name="str", debug={'msg': 'str tag'}, tags='tag1')
+        task2 = dict(name="int", debug={'msg': 'int tag'}, tags=2)
+        task3 = dict(name="list1", debug={'msg': 'list tag'}, tags=['tag3'])
+        task4 = dict(name="list2", debug={'msg': 'list tags'}, tags=['tag4s', 4])
+        task4 = dict(name="none", debug={'msg': 'no tags'})
+        self.assertEquals(['tag1'], utils.normalize_task(task1)['tags'])
+        self.assertEquals(['2'], utils.normalize_task(task2)['tags'])
+        self.assertEquals(['tag3'], utils.normalize_task(task3)['tags'])
+        self.assertEquals(['tag4', '4'], utils.normalize_task(task4)['tags'])
+        self.assertNotIn('tags', utils.normalize_task(task5))
